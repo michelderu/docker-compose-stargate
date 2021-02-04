@@ -1,7 +1,8 @@
 # Run Stargate on Cassandra using Docker Compose
 
 ## Start Cassandra and Stargate
-The `docker-compose.yml` has been configured as such to allow for a gracefull startup of all nodes and finally Stargate.  
+The `docker-compose.yml` has been configured as such to allow for a gracefull startup of all nodes and finally Stargate.
+
 It uses the docker compose healtcheck which checks for the amount of Cassandra nodes being up and running in a healthy way (no start up, no range movement).
 ```sh
 docker-compose up -d
