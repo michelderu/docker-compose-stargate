@@ -20,7 +20,7 @@ Stargate is started with the following port mappings:
 |8080|GraphQL interface for CRUD|
 |8081|REST authorization service for generating tokens|
 |8082|REST interface for CRUD|
-|9042|CQL service|
+|9042|Native transport port (CQL, drivers)|
 
 All ports available on `localhost`.
 
@@ -28,7 +28,9 @@ All ports available on `localhost`.
 Local `cqlsh` can be downloaded from https://docs.datastax.com/en/install/6.7/install/installCqlsh.html
 ```sh
 docker exec -it backend-1 cqlsh
+```
 or
+```sh
 cqlsh localhost 9042
 ```
 
@@ -50,11 +52,15 @@ curl -L -X POST 'http://localhost:8081/v1/auth' -H 'Content-Type: application/js
   }'
 ```
 
-# Using the REST, Document and GraphQL API on Astra and Local Stargate
-This part is all about how to use the REST, Document and GraphQL API's with Cassandra. For accessing the endpoints, Postman (https://www.postman.com) will be used, for which `collection` and `environment` definitions are provided. The files in this repository are inspired on the work done by Dave Joy, see: https://www.youtube.com/watch?v=SU3Z4msZaDU.
+# Using Stargate on Astra and locally
+This part is all about how to use the REST, Document and GraphQL API's with Cassandra. 
 
-## Differences in URL postfixes between Astra and Local Stargate
-First of all it is important to note that the URLs of the endpoints, apart from the hostname, are a bit different. As follows:
+For accessing the endpoints, Postman (https://www.postman.com) will be used, for which `collection` and `environment` definitions are provided.
+
+The files in this repository are inspired on the work done by Dave Joy, see: https://www.youtube.com/watch?v=SU3Z4msZaDU.
+
+## Differences in URL postfixes between Astra and locally
+First of all it is important to note that the URLs of the Stargate endpoints, apart from the hostname of course, are a bit different. As follows:
 
 |API|Astra URL postfix|Local URL postfix|
 |---|-----|-----|
