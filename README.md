@@ -35,12 +35,12 @@ or
 cqlsh localhost 9042
 ```
 
-## Access the Stargate Swagger UI
+## Access the built-in Stargate Swagger UI
 To access the Swagger UI, open http://localhost:8082/swagger-ui in your browser.  
 
 ![image](images/swagger-home.png)
 
-## Access the Stargate GraphQL playground
+## Access the built-in Stargate GraphQL playground
 To access the GraphQL UI, open http://localhost:8080/playground in your browser.  
 
 ![image](images/playground-home.png)
