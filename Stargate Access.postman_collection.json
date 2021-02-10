@@ -412,7 +412,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{protocol}}://{{host}}{{restPostfix}}v1/keyspaces/{{keyspace}}/tables/{{table}}/rows/3",
+							"raw": "{{protocol}}://{{host}}{{restPostfix}}/v1/keyspaces/{{keyspace}}/tables/{{table}}/rows/3",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{host}}{{restPostfix}}v1"

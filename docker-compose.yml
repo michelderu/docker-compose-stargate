@@ -1,68 +1,76 @@
 version: '2'
 
 services:
+
   backend-1:
     image: cassandra:3.11
     container_name: backend-1
     networks:
       - backend
-    ports:
-      - 9044:9042
-    mem_limit: 1G
+    mem_limit: 2G
     environment:
-      - HEAP_NEWSIZE=128M
-      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=1G
+      - MAX_HEAP_SIZE=2G
       - CASSANDRA_SEEDS=backend-1
       - CASSANDRA_CLUSTER_NAME=backend
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_RACK=rack1
     healthcheck:
       test: ["CMD-SHELL", "[ $$(nodetool status | grep -c UN) = 1 ]"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+
   backend-2:
     image: cassandra:3.11
     container_name: backend-2
     networks:
       - backend
-    mem_limit: 1G
+    mem_limit: 2G
     depends_on:
       - backend-1
     environment:
-      - HEAP_NEWSIZE=128M
-      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=1G
+      - MAX_HEAP_SIZE=2G
       - CASSANDRA_SEEDS=backend-1
       - CASSANDRA_CLUSTER_NAME=backend
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_RACK=rack1
     healthcheck:
       test: ["CMD-SHELL", "[ $$(nodetool status | grep -c UN) = 2 ]"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
     depends_on:
       backend-1:
         condition: service_healthy
+
   backend-3:
     image: cassandra:3.11
     container_name: backend-3
     networks:
       - backend
-    mem_limit: 1G
+    mem_limit: 2G
     depends_on:
       - backend-2
     environment:
-      - HEAP_NEWSIZE=128M
-      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=1G
+      - MAX_HEAP_SIZE=2G
       - CASSANDRA_SEEDS=backend-1
       - CASSANDRA_CLUSTER_NAME=backend
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_RACK=rack1
     healthcheck:
       test: ["CMD-SHELL", "[ $$(nodetool status | grep -c UN) = 3 ]"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
     depends_on:
       backend-2:
         condition: service_healthy
+
   stargate:
-    image: stargateio/stargate-3_11:v1.0.3
+    image: stargateio/stargate-3_11:v1.0.7
     container_name: stargate
     depends_on: 
       - backend-1
@@ -77,14 +85,14 @@ services:
       - 8081:8081
       # REST for CRUD localhost:8082/swagger-ui
       - 8082:8082
-    mem_limit: 1G
+    mem_limit: 2G
     environment:
-      - JAVA_OPTS="-Xmx256M"
+      - JAVA_OPTS="-Xmx2G"
       - CLUSTER_NAME=backend
       - CLUSTER_VERSION=3.11
       - SEED=backend-1
-      - RACK_NAME=rack1
       - DATACENTER_NAME=dc1
+      - RACK_NAME=rack1
       - DEVELOPER_MODE=false
     depends_on:
       backend-3:
