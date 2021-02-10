@@ -8,6 +8,11 @@ It uses the docker compose healtcheck which checks for the amount of Cassandra n
 docker-compose up -d
 ```
 
+## Bash into the container
+```sh
+docker exec -it backend-1 bash
+```
+
 ## Check that everything is running
 Use `nodetool` to check the health of the system. You should see four nodes running.
 ```sh
