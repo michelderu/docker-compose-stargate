@@ -1,4 +1,4 @@
-version: '2'
+version: '3.3'
 
 services:
 
@@ -7,14 +7,14 @@ services:
     container_name: backend-1
     networks:
       - backend
-    mem_limit: 2G
     environment:
-      - HEAP_NEWSIZE=1G
-      - MAX_HEAP_SIZE=2G
+      - HEAP_NEWSIZE=2G
+      - MAX_HEAP_SIZE=4G
       - CASSANDRA_SEEDS=backend-1
-      - CASSANDRA_CLUSTER_NAME=backend
+      - CASSANDRA_CLUSTER_NAME=stargate
       - CASSANDRA_DC=dc1
       - CASSANDRA_RACK=rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
     healthcheck:
       test: ["CMD-SHELL", "[ $$(nodetool status | grep -c UN) = 1 ]"]
       interval: 10s
@@ -26,16 +26,16 @@ services:
     container_name: backend-2
     networks:
       - backend
-    mem_limit: 2G
     depends_on:
       - backend-1
     environment:
-      - HEAP_NEWSIZE=1G
-      - MAX_HEAP_SIZE=2G
+      - HEAP_NEWSIZE=2G
+      - MAX_HEAP_SIZE=4G
       - CASSANDRA_SEEDS=backend-1
-      - CASSANDRA_CLUSTER_NAME=backend
+      - CASSANDRA_CLUSTER_NAME=stargate
       - CASSANDRA_DC=dc1
       - CASSANDRA_RACK=rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
     healthcheck:
       test: ["CMD-SHELL", "[ $$(nodetool status | grep -c UN) = 2 ]"]
       interval: 10s
@@ -50,16 +50,16 @@ services:
     container_name: backend-3
     networks:
       - backend
-    mem_limit: 2G
     depends_on:
       - backend-2
     environment:
-      - HEAP_NEWSIZE=1G
-      - MAX_HEAP_SIZE=2G
+      - HEAP_NEWSIZE=2G
+      - MAX_HEAP_SIZE=4G
       - CASSANDRA_SEEDS=backend-1
-      - CASSANDRA_CLUSTER_NAME=backend
+      - CASSANDRA_CLUSTER_NAME=stargate
       - CASSANDRA_DC=dc1
       - CASSANDRA_RACK=rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
     healthcheck:
       test: ["CMD-SHELL", "[ $$(nodetool status | grep -c UN) = 3 ]"]
       interval: 10s
@@ -70,7 +70,7 @@ services:
         condition: service_healthy
 
   stargate:
-    image: stargateio/stargate-3_11:v1.0.7
+    image: stargateio/stargate-3_11:v1.0.11
     container_name: stargate
     depends_on: 
       - backend-1
@@ -88,12 +88,11 @@ services:
     mem_limit: 2G
     environment:
       - JAVA_OPTS="-Xmx2G"
-      - CLUSTER_NAME=backend
+      - CLUSTER_NAME=stargate
       - CLUSTER_VERSION=3.11
-      - SEED=backend-1
+      - SEED=docker-compose-stargate-cassandra-1
       - DATACENTER_NAME=dc1
       - RACK_NAME=rack1
-      - DEVELOPER_MODE=false
     depends_on:
       backend-3:
         condition: service_healthy
