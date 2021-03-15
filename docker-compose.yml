@@ -85,12 +85,11 @@ services:
       - 8081:8081
       # REST for CRUD localhost:8082/swagger-ui
       - 8082:8082
-    mem_limit: 2G
     environment:
       - JAVA_OPTS="-Xmx2G"
       - CLUSTER_NAME=stargate
       - CLUSTER_VERSION=3.11
-      - SEED=docker-compose-stargate-cassandra-1
+      - SEED=backend-1
       - DATACENTER_NAME=dc1
       - RACK_NAME=rack1
     depends_on:
