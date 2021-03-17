@@ -1,12 +1,18 @@
 version: '3.3'
 
 services:
+# Gracefully starts:
+# - Three Cassandra 3.11 backends with included Management API
+# - One Stargate node offering REST, GraphQL and Document endpoints
 
   backend-1:
-    image: cassandra:3.11
+    image: datastax/cassandra-mgmtapi-3_11_10:v0.1.23
     container_name: backend-1
     networks:
       - backend
+    ports:
+      # Management API (http://localhost:9081/api/v0/probes/liveness)
+      - 9081:8080
     environment:
       - HEAP_NEWSIZE=2G
       - MAX_HEAP_SIZE=4G
@@ -16,16 +22,19 @@ services:
       - CASSANDRA_RACK=rack1
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
     healthcheck:
-      test: ["CMD-SHELL", "[ $$(nodetool status | grep -c UN) = 1 ]"]
+      test: curl --fail http://localhost:8080/api/v0/probes/liveness || exit 1
       interval: 10s
       timeout: 5s
       retries: 10
 
   backend-2:
-    image: cassandra:3.11
+    image: datastax/cassandra-mgmtapi-3_11_10:v0.1.23
     container_name: backend-2
     networks:
       - backend
+    ports:
+      # Management API (http://localhost:9082/api/v0/probes/liveness)
+      - 9082:8080
     depends_on:
       - backend-1
     environment:
@@ -37,7 +46,7 @@ services:
       - CASSANDRA_RACK=rack1
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
     healthcheck:
-      test: ["CMD-SHELL", "[ $$(nodetool status | grep -c UN) = 2 ]"]
+      test: curl --fail http://localhost:8080/api/v0/probes/liveness || exit 1
       interval: 10s
       timeout: 5s
       retries: 10
@@ -46,10 +55,13 @@ services:
         condition: service_healthy
 
   backend-3:
-    image: cassandra:3.11
+    image: datastax/cassandra-mgmtapi-3_11_10:v0.1.23
     container_name: backend-3
     networks:
       - backend
+    ports:
+      # Management API (http://localhost:9083/api/v0/probes/liveness)
+      - 9083:8080
     depends_on:
       - backend-2
     environment:
@@ -61,7 +73,7 @@ services:
       - CASSANDRA_RACK=rack1
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
     healthcheck:
-      test: ["CMD-SHELL", "[ $$(nodetool status | grep -c UN) = 3 ]"]
+      test: curl --fail http://localhost:8080/api/v0/probes/liveness || exit 1
       interval: 10s
       timeout: 5s
       retries: 10
@@ -77,14 +89,14 @@ services:
     networks:
       - backend
     ports:
-      # CQL Service
-      - 9042:9042
-      # GraphQL interface for CRUD
+      # GraphQL interface for CRUD (http://localhost:8080/api/playground)
       - 8080:8080
       # Rest authorization (token)
       - 8081:8081
-      # REST for CRUD localhost:8082/swagger-ui
+      # REST for CRUD (http://localhost:8082/swagger-ui)
       - 8082:8082
+      # CQL Service
+      - 9042:9042
     environment:
       - JAVA_OPTS="-Xmx2G"
       - CLUSTER_NAME=stargate
